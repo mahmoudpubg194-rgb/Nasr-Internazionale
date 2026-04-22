@@ -159,19 +159,36 @@ export const TESTIMONIALS = [
   {
     id: '1',
     name: 'Marco Rossi',
-    text: 'Servizio impeccabile e veloce. Ho fatto il 730 in meno di 20 minuti.',
+    text: 'Servizio impeccabile e veloce. Ho fatto il 730 in meno di 20 minuti senza alcuno stress.',
+    role: 'Privato',
     rating: 5
   },
   {
     id: '2',
     name: 'Ahmed K.',
-    text: 'Mi hanno aiutato con il rinnovo del permesso. Molto gentili e preparati.',
+    text: 'Mi hanno aiutato con il rinnovo del permesso di soggiorno. Molto gentili e preparati in diverse lingue.',
+    role: 'Lavoratore Straniero',
     rating: 5
   },
   {
     id: '3',
-    name: 'Elena V.',
-    text: 'Prezzi onesti e massima professionalità. Consigliatissimo!',
+    name: 'Elena Valenti',
+    text: 'Prezzi onesti e massima professionalità. Mi hanno seguito passo passo per l\'ISEE universitario di mia figlia.',
+    role: 'Madre di famiglia',
+    rating: 5
+  },
+  {
+    id: '4',
+    name: 'Luca Bianchi',
+    text: 'Il miglior CAF di Milano Nord. Studio pulito, personale accogliente e pratiche evase in tempi record.',
+    role: 'Imprenditore',
+    rating: 5
+  },
+  {
+    id: '5',
+    name: 'Sara J.',
+    text: 'Professionisti seri che sanno come gestire pratiche complesse come le successioni. Molto soddisfatta.',
+    role: 'Cliente Fedele',
     rating: 4
   }
 ];

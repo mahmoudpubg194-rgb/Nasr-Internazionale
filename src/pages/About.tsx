@@ -9,7 +9,7 @@ const About: React.FC = () => {
         <div className="flex flex-col lg:flex-row items-center gap-16 mb-24">
           <div className="lg:w-1/2">
             <h1 className="text-4xl md:text-6xl font-black text-brand-text-main mb-8 leading-tight">
-              Oltre 15 anni di assistenza<br/>
+              Oltre 26 anni di assistenza<br/>
               <span className="text-brand-blue">dedicata a Milano.</span>
             </h1>
             <div className="space-y-6 text-lg text-brand-text-muted leading-relaxed">
@@ -41,7 +41,7 @@ const About: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
           {[
-            { title: 'Esperienza', desc: '15 anni sul campo a Milano.', icon: History },
+            { title: 'Esperienza', desc: '26 anni sul campo a Milano.', icon: History },
             { title: 'Trasparenza', desc: 'Prezzi chiari e senza sorprese.', icon: ShieldCheck },
             { title: 'Certificazione', desc: 'Socio certificato CAF Nazionale.', icon: Award },
             { title: 'Comunità', desc: 'Supporto in oltre 5 lingue.', icon: Users },

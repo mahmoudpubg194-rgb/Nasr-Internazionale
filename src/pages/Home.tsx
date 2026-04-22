@@ -3,6 +3,8 @@ import { Hero } from '../components/Hero';
 import { ServicesSection } from '../components/Services';
 import { ForeignerSection } from '../components/TrustAndForeigner';
 
+import { Testimonials } from '../components/Testimonials';
+
 interface HomeProps {
   onOpenBooking: () => void;
 }
@@ -30,6 +32,8 @@ const Home: React.FC<HomeProps> = ({ onOpenBooking }) => {
       <ServicesSection />
       
       <ForeignerSection />
+
+      <Testimonials />
       
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4 md:px-12 text-center">

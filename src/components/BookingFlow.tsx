@@ -19,18 +19,25 @@ export const BookingFlow = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
   const nextStep = () => setStep(s => s + 1);
   const prevStep = () => setStep(s => s - 1);
 
-  const times = ['09:00', '10:00', '11:00', '12:00', '15:00', '16:00', '17:00', '18:00'];
-  const dates = [
-    { label: 'Oggi', value: '2026-04-22' },
-    { label: 'Domani', value: '2026-04-23' },
-    { label: 'Venerdì 24', value: '2026-04-24' },
-    { label: 'Sabato 25', value: '2026-04-25' },
-    { label: 'Lunedì 27', value: '2026-04-27' },
-  ];
+  const handleFinish = async () => {
+    try {
+      const response = await fetch('/api/booking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-  const handleFinish = () => {
-    // In a real app, send to API
-    nextStep();
+      if (response.ok) {
+        nextStep();
+      } else {
+        alert('Si è verificato un errore durante la prenotazione. Riprova più tardi.');
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      alert('Errore di connessione. Controlla la tua rete.');
+    }
   };
 
   return (
@@ -77,10 +84,10 @@ export const BookingFlow = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                     <button
                       key={s.id}
                       onClick={() => { setFormData({ ...formData, service: s.title }); nextStep(); }}
-                      className={`p-4 rounded-xl border-2 text-left transition-all ${formData.service === s.title ? 'border-brand-green bg-green-50' : 'border-gray-100 hover:border-brand-blue hover:bg-brand-accent'}`}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${formData.service === s.title ? 'border-brand-blue bg-blue-50' : 'border-gray-100 hover:border-brand-blue hover:bg-brand-bg/50'}`}
                     >
-                      <p className="font-bold">{s.title}</p>
-                      <p className="text-xs text-gray-500 mt-1">{s.price || 'Consulenza dedicata'}</p>
+                      <p className="font-bold text-sm text-brand-text-main">{s.title}</p>
+                      <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wider font-bold">Consulenza dedicata</p>
                     </button>
                   ))}
                 </div>
@@ -95,46 +102,41 @@ export const BookingFlow = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-6"
               >
-                <div>
-                  <h3 className="text-lg font-bold mb-4">Scegli la data</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {dates.map(d => (
-                      <button
-                        key={d.value}
-                        onClick={() => setFormData({ ...formData, date: d.label })}
-                        className={`px-4 py-2 rounded-lg border-2 font-medium transition-all ${formData.date === d.label ? 'border-brand-green bg-green-50 text-brand-green' : 'border-gray-100 hover:border-gray-300'}`}
-                      >
-                        {d.label}
-                      </button>
-                    ))}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold mb-2">Quando vuoi venire?</h3>
+                  <p className="text-sm text-gray-500 mb-6 italic">Seleziona il giorno e l'ora che preferisci. Siamo aperti tutti i giorni.</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-xs font-black uppercase text-gray-400 mb-2 tracking-widest">Data Appuntamento</label>
+                      <input 
+                        type="date"
+                        min={new Date().toISOString().split('T')[0]}
+                        value={formData.date}
+                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                        className="w-full p-4 bg-brand-bg rounded-xl border-2 border-brand-border focus:border-brand-blue outline-none transition-all font-bold text-brand-text-main"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-black uppercase text-gray-400 mb-2 tracking-widest">Ora Appuntamento</label>
+                      <input 
+                        type="time"
+                        value={formData.time}
+                        onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                        className="w-full p-4 bg-brand-bg rounded-xl border-2 border-brand-border focus:border-brand-blue outline-none transition-all font-bold text-brand-text-main"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                {formData.date && (
-                  <div>
-                    <h3 className="text-lg font-bold mb-4">Scegli l'orario</h3>
-                    <div className="grid grid-cols-4 gap-2">
-                      {times.map(t => (
-                        <button
-                          key={t}
-                          onClick={() => setFormData({ ...formData, time: t })}
-                          className={`p-2 rounded-lg border-2 text-center font-medium transition-all ${formData.time === t ? 'border-brand-green bg-green-50 text-brand-green' : 'border-gray-100 hover:border-gray-300'}`}
-                        >
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex justify-between mt-8">
-                  <button onClick={prevStep} className="flex items-center text-gray-500 font-bold">
+                <div className="flex justify-between mt-12 pt-8 border-t border-gray-100">
+                  <button onClick={prevStep} className="flex items-center text-gray-400 font-bold hover:text-brand-blue transition-colors">
                     <ChevronLeft size={20} className="mr-1" /> Indietro
                   </button>
                   <button
                     disabled={!formData.date || !formData.time}
                     onClick={nextStep}
-                    className="bg-brand-blue text-white px-8 py-3 rounded-xl font-bold disabled:opacity-50 flex items-center"
+                    className="bg-brand-blue text-white px-10 py-4 rounded-xl font-bold disabled:opacity-50 flex items-center shadow-lg hover:shadow-xl transition-all"
                   >
                     Continua <ChevronRight size={20} className="ml-1" />
                   </button>

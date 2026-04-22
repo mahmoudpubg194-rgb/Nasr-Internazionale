@@ -59,7 +59,7 @@ export const Hero = ({ onOpenBooking }: { onOpenBooking: () => void }) => {
       <div className="absolute bottom-0 left-4 right-4 md:left-[48px] md:right-[48px]">
         <div className="bg-white rounded-t-2xl h-24 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] flex items-center justify-around px-8 border-x border-t border-brand-border">
           {[
-            { label: 'Anni di Esperienza', value: '15+' },
+            { label: 'Anni di Esperienza', value: '26+' },
             { label: 'Clienti Serviti', value: '10k+' },
             { label: 'Lingue Parlate', value: '4' },
             { label: 'Tempi Mediani', value: '24h' }
