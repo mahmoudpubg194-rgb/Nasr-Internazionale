@@ -28,11 +28,11 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     iconName: 'Calculator',
     description: 'Accesso a bonus, agevolazioni e prestazioni sociali.',
     items: [
+      'Bonus Finder: Test rapido agevolazioni',
       'Calcolo ISEE: Ordinario, corrente, universitari',
-      'DSU (Dichiarazione Sostitutiva Unica): Per bonus e prestazioni',
+      'DSU (Dichiarazione Sostitutiva Unica)',
       'Bonus Sociali: Energia, gas e acqua',
-      'Assegno Unico e Universale: Per figli a carico',
-      'Bonus vari: Bebè, nido, assegni di maternità'
+      'Assegno Unico e Universale'
     ]
   },
   {
@@ -66,22 +66,34 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     iconName: 'PlusCircle',
     description: 'Successioni, identità digitale e pratiche varie.',
     items: [
+      'Firma Digitale Remota: Firma dal tuo smartphone',
       'Successioni: Dichiarazione e pratiche collegate',
-      'Spid e Firma Digitale: Rilascio credenziali digitali',
-      'Visure camerali: Per aziende',
+      'Spid: Rilascio credenziali digitali',
       'Invio telematico: Atti all\'Agenzia delle Entrate'
     ]
   },
   {
-    id: 'stranieri-extra',
-    title: 'Servizi per Stranieri',
-    iconName: 'Globe',
-    description: 'Supporto dedicato per permessi, cittadinanza e ricongiungimenti.',
+    id: 'viaggi',
+    title: 'Viaggi e Biglietteria',
+    iconName: 'Plane',
+    description: 'Prenotazione biglietti aerei e assistenza viaggi.',
     items: [
+      'Biglietti Aerei: Prenotazione voli nazionali e internazionali',
+      'Check-in online e gestione prenotazioni',
+      'Assicurazioni viaggio',
+      'Consulenza per visti turistici'
+    ]
+  },
+  {
+    id: 'stranieri-extra',
+    title: 'Servizi per Stranieri ed Espatriati',
+    iconName: 'Globe',
+    description: 'Supporto dedicato per permessi, cittadinanza e fiscalità internazionale.',
+    items: [
+      'Bonus Impatriati: Agevolazioni per chi rientra',
       'Permessi di Soggiorno: Rinnovo e aggiornamento',
       'Cittadinanza: Assistenza domande',
-      'Ricongiungimenti Familiari',
-      'Supporto Multilingue (AR, ENG, FR, ES)'
+      'Consulenza AIRE e Redditi Esteri'
     ]
   }
 ];
@@ -152,6 +164,18 @@ export const SERVICES: Service[] = [
       'Modello ISEE in corso di validità'
     ],
     color: 'bg-purple-500'
+  },
+  {
+    id: 'viaggi',
+    title: 'Biglietti Aerei & Viaggi',
+    description: 'Prenotazione biglietti aerei nazionali e internazionali con le migliori tariffe.',
+    iconName: 'Plane',
+    documents: [
+      'Documento d\'identità o Passaporto',
+      'Date e destinazione del viaggio'
+    ],
+    price: 'Tariffe competitive',
+    color: 'bg-indigo-500'
   }
 ];
 

@@ -3,12 +3,17 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navigation } from './components/Navigation';
 import { Footer, WhatsAppButton } from './components/Footer';
 import { BookingFlow } from './components/BookingFlow';
+import { AIChatBot } from './components/AIChatBot';
 
 // Lazy load pages for better performance
 const Home = lazy(() => import('./pages/Home'));
 const Services = lazy(() => import('./pages/Services'));
 const About = lazy(() => import('./pages/About'));
 const Contact = lazy(() => import('./pages/Contact'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const BonusFinder = lazy(() => import('./pages/BonusFinder'));
+const ColfBadanti = lazy(() => import('./pages/ColfBadanti'));
+const Expatriates = lazy(() => import('./pages/Expatriates'));
 
 export default function App() {
   const [isBookingOpen, setIsBookingOpen] = useState(false);
@@ -32,12 +37,17 @@ export default function App() {
               <Route path="/servizi" element={<Services />} />
               <Route path="/chi-siamo" element={<About />} />
               <Route path="/contatti" element={<Contact />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/bonus-finder" element={<BonusFinder />} />
+              <Route path="/servizi/colf-badanti" element={<ColfBadanti />} />
+              <Route path="/servizi/espatriati" element={<Expatriates />} />
             </Routes>
           </Suspense>
         </div>
 
         <Footer />
         <WhatsAppButton />
+        <AIChatBot />
         
         <BookingFlow isOpen={isBookingOpen} onClose={closeBooking} />
       </div>

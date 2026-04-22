@@ -2,18 +2,20 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { SERVICE_CATEGORIES } from '../constants';
 import * as Icons from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Services: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="pt-32 pb-24 bg-brand-bg/30 min-h-screen">
       <div className="container mx-auto px-4 md:px-12">
         <div className="max-w-4xl mx-auto text-center mb-20">
           <h1 className="text-4xl md:text-6xl font-black text-brand-text-main mb-6 leading-tight">
-            I Nostri Servizi Professionale
+            {t('services_page_title')}
           </h1>
           <p className="text-lg text-brand-text-muted leading-relaxed">
-            Dalla consulenza fiscale completa alle pratiche per la cittadinanza, 
-            copriamo tutte le necessità burocratiche per singoli, famiglie e lavoratori.
+            {t('services_page_subtitle')}
           </p>
         </div>
 
@@ -33,25 +35,25 @@ const Services: React.FC = () => {
                 </div>
                 
                 <h3 className="text-2xl font-bold text-brand-text-main mb-4 tracking-tight">
-                  {category.title}
+                  {t(`services.${category.id}.title`)}
                 </h3>
                 
                 <p className="text-sm text-brand-text-muted mb-8 leading-relaxed">
-                  {category.description}
+                  {t(`services.${category.id}.desc`)}
                 </p>
 
                 <div className="space-y-4 flex-grow mb-10">
                   {category.items.map((item, i) => (
                     <div key={i} className="flex items-start gap-4 p-4 bg-brand-bg rounded-xl border border-brand-border/50 group/item hover:border-brand-blue/30 transition-all">
                       <div className="w-2 h-2 rounded-full bg-brand-blue mt-2 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-brand-text-main">{item}</span>
+                      <span className="text-sm font-semibold text-brand-text-main">{t(`services.${category.id}.item_${i}`, item)}</span>
                     </div>
                   ))}
                 </div>
 
                 <div className="pt-8 border-t border-brand-border mt-auto">
                    <button className="w-full bg-brand-blue text-white py-4 rounded-xl font-bold hover:bg-brand-blue-light transition-all flex items-center justify-center">
-                      Richiedi Preventivo Gratuito
+                      {t('service_get_quote')}
                    </button>
                 </div>
               </motion.div>

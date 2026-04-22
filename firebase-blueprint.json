@@ -1,0 +1,67 @@
+{
+  "entities": {
+    "user_profiles": {
+      "title": "User Profiles",
+      "description": "Extended user information and tax preferences.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "taxFootprint": {
+          "type": "object",
+          "properties": {
+            "totalPaid": { "type": "number" },
+            "totalRecovered": { "type": "number" },
+            "year": { "type": "number" }
+          }
+        }
+      },
+      "required": ["uid", "email"]
+    },
+    "practices": {
+      "title": "Practices",
+      "description": "Tax and bureaucratic files tracking.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string" },
+        "status": { "type": "string", "enum": ["received", "processing", "review", "sent", "completed"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "documents": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["userId", "type", "status"]
+    },
+    "documents": {
+      "title": "Document Vault",
+      "description": "Metadata for uploaded and signed documents.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "url": { "type": "string" },
+        "isSigned": { "type": "boolean" },
+        "signedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "user_profiles",
+      "description": "User specific configuration and profile"
+    },
+    "practices/{practiceId}": {
+      "schema": "practices",
+      "description": "Tracking for tax practices"
+    },
+    "documents/{docId}": {
+      "schema": "documents",
+      "description": "Document metadata"
+    }
+  }
+}

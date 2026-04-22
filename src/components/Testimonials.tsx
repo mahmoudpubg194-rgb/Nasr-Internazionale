@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import { TESTIMONIALS } from '../constants';
+import { useTranslation } from 'react-i18next';
 
 export const Testimonials = () => {
+  const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
@@ -48,14 +50,13 @@ export const Testimonials = () => {
       <div className="container mx-auto px-4 md:px-12 relative z-10">
         <div className="text-center mb-16">
           <div className="inline-flex items-center px-3 py-1 bg-white/10 rounded-full text-white text-[10px] font-bold uppercase tracking-wider mb-6 border border-white/10 backdrop-blur-sm">
-            Recensioni
+            {t('sections_testimonials_badge', 'Recensioni')}
           </div>
           <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
-            Cosa dicono i nostri clienti
+            {t('sections_testimonials_title', 'Cosa dicono i nostri clienti')}
           </h2>
           <p className="text-lg text-white/70 max-w-2xl mx-auto">
-            La fiducia dei nostri clienti è il nostro traguardo più importante. 
-            Scopri le loro esperienze con CAF Nasr.
+            {t('sections_testimonials_desc', 'La fiducia dei nostri clienti è il nostro traguardo più importante.')}
           </p>
         </div>
 
@@ -90,14 +91,14 @@ export const Testimonials = () => {
                     ))}
                   </div>
                   <p className="text-xl md:text-2xl font-medium text-white leading-relaxed mb-8 italic">
-                    "{TESTIMONIALS[currentIndex].text}"
+                    "{t(`testimonials.text_${TESTIMONIALS[currentIndex].id}`, TESTIMONIALS[currentIndex].text)}"
                   </p>
                   <div>
                     <h4 className="text-xl font-bold text-white mb-1">
                       {TESTIMONIALS[currentIndex].name}
                     </h4>
                     <p className="text-sm font-bold text-brand-green uppercase tracking-widest">
-                      {(TESTIMONIALS[currentIndex] as any).role || 'Cliente'}
+                      {t(`testimonials.role_${TESTIMONIALS[currentIndex].id === '1' ? 'privato' : TESTIMONIALS[currentIndex].id === '2' ? 'straniero' : TESTIMONIALS[currentIndex].id === '3' ? 'madre' : TESTIMONIALS[currentIndex].id === '4' ? 'imprenditore' : 'fedele'}`, (TESTIMONIALS[currentIndex] as any).role || 'Cliente')}
                     </p>
                   </div>
                 </div>
