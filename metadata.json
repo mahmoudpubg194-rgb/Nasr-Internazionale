@@ -1,0 +1,12 @@
+{
+  "name": "CAF Nasr Internazionale",
+  "description": "Assistenza fiscale semplice, veloce e multilingue. Prenotazione 730, ISEE, Bonus e pratiche per stranieri.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "Prenotazioni Online",
+    "Supporto Multilingue",
+    "Integrazione WhatsApp"
+  ]
+}
