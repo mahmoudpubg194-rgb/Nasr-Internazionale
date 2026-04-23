@@ -2,11 +2,12 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Default deny
+    // 0. Global Safety Net
     match /{document=**} {
       allow read, write: if false;
     }
 
+    // --- PHASE 3: Primitive Definitions ---
     function isSignedIn() {
       return request.auth != null;
     }
@@ -19,29 +20,51 @@ service cloud.firestore {
       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- PHASE 4: Entity Rules ---
+
     // User Profiles
     match /users/{userId} {
       allow get: if isOwner(userId);
       allow create: if isOwner(userId) 
-        && request.resource.data.keys().hasAll(['uid', 'email'])
-        && request.resource.data.uid == request.auth.uid;
+        && incoming().keys().hasAll(['uid', 'email'])
+        && incoming().uid == request.auth.uid;
       allow update: if isOwner(userId)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'taxFootprint']);
+        && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'taxFootprint']);
     }
 
     // Practices
     match /practices/{practiceId} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      // Secure List Query (Pillar 8): Enforces that the query MUST filter by userId
+      allow read: if isSignedIn() && existing().userId == request.auth.uid;
+      
+      allow create: if isSignedIn() 
+        && isValidId(practiceId)
+        && incoming().userId == request.auth.uid
+        && incoming().keys().hasAll(['userId', 'type', 'status'])
+        && incoming().status in ['received', 'processing', 'review', 'sent', 'completed'];
     }
 
     // Documents
     match /documents/{docId} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isSignedIn() 
-        && resource.data.userId == request.auth.uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isSigned', 'signedAt']);
+      // Secure List Query (Pillar 8)
+      allow read: if isSignedIn() && existing().userId == request.auth.uid;
+      
+      allow create: if isSignedIn()
+        && isValidId(docId)
+        && incoming().userId == request.auth.uid
+        && incoming().keys().hasAll(['userId', 'name', 'url', 'isSigned']);
+        
+      allow update: if isSignedIn()
+        && existing().userId == request.auth.uid
+        && incoming().diff(existing()).affectedKeys().hasOnly(['isSigned', 'signedAt']);
     }
   }
 }

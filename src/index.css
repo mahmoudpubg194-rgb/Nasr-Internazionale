@@ -34,3 +34,41 @@
 .hero-gradient {
   background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
 }
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 10s linear infinite;
+}
+
+.markdown-body strong {
+  @apply font-black text-brand-blue;
+}
+
+.markdown-body ul {
+  @apply list-disc ml-4 my-2 opacity-90;
+}
+
+.markdown-body p {
+  @apply mb-2 last:mb-0;
+}
+
+/* Custom Scrollbar for Chat */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #CBD5E1;
+}

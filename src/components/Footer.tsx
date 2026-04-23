@@ -41,10 +41,10 @@ export const Footer = () => {
           <div>
             <h4 className="font-bold text-lg mb-6">{t('nav_services')}</h4>
             <ul className="space-y-4 text-blue-100/70">
-              <li><a href="#" className="hover:text-brand-green">{t('services.fiscale.title')}</a></li>
-              <li><a href="#" className="hover:text-brand-green">{t('services.agevolazioni.title')}</a></li>
-              <li><a href="#" className="hover:text-brand-green">{t('services.stranieri-extra.title')}</a></li>
-              <li><a href="#" className="hover:text-brand-green">{t('services.viaggi.title')}</a></li>
+              <li><a href="/servizi" className="hover:text-brand-green">{t('services.fiscale.title')}</a></li>
+              <li><a href="/servizi" className="hover:text-brand-green">{t('services.agevolazioni.title')}</a></li>
+              <li><a href="/privacy" className="hover:text-brand-green">Privacy Policy</a></li>
+              <li><a href="/terms" className="hover:text-brand-green">Termini e Condizioni</a></li>
             </ul>
           </div>
 

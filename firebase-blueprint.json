@@ -48,6 +48,34 @@
         "isSigned": { "type": "boolean" },
         "signedAt": { "type": "string", "format": "date-time" }
       }
+    },
+    "orders": {
+      "title": "Stripe Orders",
+      "description": "Record of service purchases.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "serviceId": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "paid", "failed"] },
+        "stripeSessionId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "serviceId", "amount", "status"]
+    },
+    "appointments": {
+      "title": "Appointments",
+      "description": "Calendar bookings for video consultations.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "type": { "type": "string" },
+        "orderId": { "type": "string" },
+        "meetingLink": { "type": "string" }
+      },
+      "required": ["userId", "date", "time"]
     }
   },
   "firestore": {
@@ -62,6 +90,14 @@
     "documents/{docId}": {
       "schema": "documents",
       "description": "Document metadata"
+    },
+    "orders/{orderId}": {
+      "schema": "orders",
+      "description": "Payment records"
+    },
+    "appointments/{appointmentId}": {
+      "schema": "appointments",
+      "description": "Scheduled consultations"
     }
   }
 }

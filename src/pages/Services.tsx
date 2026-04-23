@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { SERVICE_CATEGORIES } from '../constants';
 import * as Icons from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const Services: React.FC = () => {
+const Services: React.FC<{ onOpenBooking?: () => void }> = ({ onOpenBooking }) => {
   const { t } = useTranslation();
 
   return (
@@ -35,25 +35,39 @@ const Services: React.FC = () => {
                 </div>
                 
                 <h3 className="text-2xl font-bold text-brand-text-main mb-4 tracking-tight">
-                  {t(`services.${category.id}.title`)}
+                  {category.title}
                 </h3>
                 
                 <p className="text-sm text-brand-text-muted mb-8 leading-relaxed">
-                  {t(`services.${category.id}.desc`)}
+                  {category.description}
                 </p>
 
                 <div className="space-y-4 flex-grow mb-10">
-                  {category.items.map((item, i) => (
-                    <div key={i} className="flex items-start gap-4 p-4 bg-brand-bg rounded-xl border border-brand-border/50 group/item hover:border-brand-blue/30 transition-all">
-                      <div className="w-2 h-2 rounded-full bg-brand-blue mt-2 flex-shrink-0" />
-                      <span className="text-sm font-semibold text-brand-text-main">{t(`services.${category.id}.item_${i}`, item)}</span>
+                  {category.items.map((item) => (
+                    <div key={item.id} className="flex flex-col gap-2 p-4 bg-brand-bg rounded-xl border border-brand-border/50 group/item hover:border-brand-blue/30 transition-all">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-semibold text-brand-text-main">{item.name}</span>
+                        <span className="text-brand-blue font-bold">
+                          {item.price === 0 ? 'Gratuito' : `€${item.price}`}
+                        </span>
+                      </div>
+                      <button 
+                        onClick={onOpenBooking}
+                        className="text-xs font-bold text-brand-blue hover:underline text-left mt-1 flex items-center gap-1"
+                      >
+                        {item.price === 0 ? 'Prenota Ora' : 'Richiedi Servizio'}
+                        <Icons.ArrowRight size={12} />
+                      </button>
                     </div>
                   ))}
                 </div>
 
                 <div className="pt-8 border-t border-brand-border mt-auto">
-                   <button className="w-full bg-brand-blue text-white py-4 rounded-xl font-bold hover:bg-brand-blue-light transition-all flex items-center justify-center">
-                      {t('service_get_quote')}
+                   <button 
+                     onClick={onOpenBooking}
+                     className="w-full bg-brand-blue text-white py-4 rounded-xl font-bold hover:bg-brand-blue-light transition-all flex items-center justify-center"
+                   >
+                      Prenota Appuntamento
                    </button>
                 </div>
               </motion.div>

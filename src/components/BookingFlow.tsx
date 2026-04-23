@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Calendar, Clock, User, CheckCircle2, ChevronRight, ChevronLeft } from 'lucide-react';
+import { X, Calendar, Clock, User, Phone, Mail, CheckCircle2, ChevronRight, ChevronLeft } from 'lucide-react';
 import { SERVICES } from '../constants';
 import { useTranslation } from 'react-i18next';
 
@@ -152,40 +152,134 @@ export const BookingFlow = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="space-y-4"
+                className="space-y-6"
               >
-                <h3 className="text-lg font-bold mb-4">{t('book_data_q')}</h3>
-                <div className="space-y-4">
-                  <input
-                    type="text"
-                    placeholder={t('book_name_ph')}
-                    className="w-full p-4 rounded-xl border-2 border-gray-100 focus:border-brand-blue outline-none"
-                    value={formData.name}
-                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  />
-                  <input
-                    type="tel"
-                    placeholder={t('book_phone_ph')}
-                    className="w-full p-4 rounded-xl border-2 border-gray-100 focus:border-brand-blue outline-none"
-                    value={formData.phone}
-                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                  />
-                  <input
-                    type="email"
-                    placeholder={t('book_email_ph')}
-                    className="w-full p-4 rounded-xl border-2 border-gray-100 focus:border-brand-blue outline-none"
-                    value={formData.email}
-                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  />
+                <div className="mb-6">
+                  <h3 className="text-xl font-black text-brand-blue mb-2">{t('book_data_q')}</h3>
+                  <p className="text-sm text-gray-400">{t('book_data_desc', 'Inserisci i tuoi recapiti per essere ricontattato.')}</p>
                 </div>
-                <div className="flex justify-between mt-8">
-                  <button onClick={prevStep} className="flex items-center text-gray-500 font-bold">
+
+                <div className="space-y-4">
+                  {/* Name Input */}
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-blue transition-colors z-10 pointer-events-none">
+                      <User size={20} />
+                    </div>
+                    <input
+                      id="booking-name"
+                      type="text"
+                      placeholder=" "
+                      className={`peer w-full pl-12 pr-12 pt-6 pb-2 rounded-xl border-2 outline-none transition-all font-bold text-brand-text-main ${
+                        formData.name ? 'border-brand-blue/30 bg-blue-50/20' : 'border-gray-100 bg-brand-bg hover:border-gray-200'
+                      } focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5`}
+                      value={formData.name}
+                      onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    />
+                    <label 
+                      htmlFor="booking-name"
+                      className="absolute left-12 top-1.5 text-[10px] font-black uppercase tracking-widest text-gray-400 transition-all pointer-events-none
+                        peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:font-bold peer-placeholder-shown:capitalize peer-placeholder-shown:tracking-normal
+                        peer-focus:top-1.5 peer-focus:-translate-y-0 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-brand-blue"
+                    >
+                      {t('book_name_ph')}
+                    </label>
+                    <AnimatePresence>
+                      {formData.name && (
+                        <motion.div 
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-green"
+                        >
+                          <CheckCircle2 size={20} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Phone Input */}
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-blue transition-colors z-10 pointer-events-none">
+                      <Phone size={20} />
+                    </div>
+                    <input
+                      id="booking-phone"
+                      type="tel"
+                      placeholder=" "
+                      className={`peer w-full pl-12 pr-12 pt-6 pb-2 rounded-xl border-2 outline-none transition-all font-bold text-brand-text-main ${
+                        formData.phone.length >= 8 ? 'border-brand-blue/30 bg-blue-50/20' : 'border-gray-100 bg-brand-bg hover:border-gray-200'
+                      } focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5`}
+                      value={formData.phone}
+                      onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                    />
+                    <label 
+                      htmlFor="booking-phone"
+                      className="absolute left-12 top-1.5 text-[10px] font-black uppercase tracking-widest text-gray-400 transition-all pointer-events-none
+                        peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:font-bold peer-placeholder-shown:capitalize peer-placeholder-shown:tracking-normal
+                        peer-focus:top-1.5 peer-focus:-translate-y-0 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-brand-blue"
+                    >
+                      {t('book_phone_ph')}
+                    </label>
+                    <AnimatePresence>
+                      {formData.phone.length >= 8 && (
+                        <motion.div 
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-green"
+                        >
+                          <CheckCircle2 size={20} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Email Input */}
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-blue transition-colors z-10 pointer-events-none">
+                      <Mail size={20} />
+                    </div>
+                    <input
+                      id="booking-email"
+                      type="email"
+                      placeholder=" "
+                      className={`peer w-full pl-12 pr-12 pt-6 pb-2 rounded-xl border-2 outline-none transition-all font-bold text-brand-text-main ${
+                        formData.email && formData.email.includes('@') ? 'border-brand-blue/30 bg-blue-50/20' : 'border-gray-100 bg-brand-bg hover:border-gray-200'
+                      } focus:border-brand-blue focus:ring-4 focus:ring-brand-blue/5`}
+                      value={formData.email}
+                      onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    />
+                    <label 
+                      htmlFor="booking-email"
+                      className="absolute left-12 top-1.5 text-[10px] font-black uppercase tracking-widest text-gray-400 transition-all pointer-events-none
+                        peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:font-bold peer-placeholder-shown:capitalize peer-placeholder-shown:tracking-normal
+                        peer-focus:top-1.5 peer-focus:-translate-y-0 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-widest peer-focus:text-brand-blue"
+                    >
+                      {t('book_email_ph')}
+                    </label>
+                    <AnimatePresence>
+                      {formData.email && formData.email.includes('@') && (
+                        <motion.div 
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-green"
+                        >
+                          <CheckCircle2 size={20} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 pt-8 border-t border-gray-100">
+                  <button onClick={prevStep} className="flex items-center text-gray-400 font-bold hover:text-brand-blue transition-colors">
                     <ChevronLeft size={20} className="mr-1" /> {t('book_back')}
                   </button>
                   <button
                     disabled={!formData.name || !formData.phone}
                     onClick={handleFinish}
-                    className="bg-brand-green text-white px-8 py-3 rounded-xl font-bold"
+                    className="w-full sm:w-auto bg-brand-blue text-white px-12 py-4 rounded-xl font-bold disabled:opacity-50 flex items-center justify-center shadow-lg hover:shadow-xl transition-all"
                   >
                     {t('book_confirm')}
                   </button>

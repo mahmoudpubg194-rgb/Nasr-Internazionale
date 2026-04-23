@@ -12,6 +12,8 @@ const Contact: React.FC = () => {
   
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
+      name: '',
+      email: '',
       service: prefilledBonus ? 'isee' : 'fiscale',
       message: prefilledBonus ? `Richiesta assistenza per: ${prefilledBonus}. Identificato tramite Bonus Finder.` : ''
     }

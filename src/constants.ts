@@ -1,10 +1,16 @@
 import { Service } from './types';
 
+export interface ServiceItem {
+  id: string;
+  name: string;
+  price: number;
+}
+
 export interface ServiceCategory {
   id: string;
   title: string;
   iconName: string;
-  items: string[];
+  items: ServiceItem[];
   description: string;
 }
 
@@ -15,11 +21,10 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     iconName: 'FileText',
     description: 'Assistenza completa per la tua situazione fiscale e dichiarativa.',
     items: [
-      'Modello 730: Compilazione e invio telematico',
-      'Modello Redditi PF (ex Unico): Per chi non può utilizzare il 730',
-      'Modello RED: Dichiarazione dei redditi per pensionati INPS',
-      'Calcolo imposte e F24: IRPEF, addizionali e predisposizione pagamenti',
-      'Visto di conformità: Garanzia di correttezza dei dati nel 730'
+      { id: '730_base', name: 'Modello 730 Base', price: 30 },
+      { id: '730_completo', name: 'Modello 730 con Visto', price: 50 },
+      { id: 'unico_pf', name: 'Modello Redditi PF', price: 80 },
+      { id: 'red_inps', name: 'Modello RED Pensionati', price: 20 }
     ]
   },
   {
@@ -28,11 +33,10 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     iconName: 'Calculator',
     description: 'Accesso a bonus, agevolazioni e prestazioni sociali.',
     items: [
-      'Bonus Finder: Test rapido agevolazioni',
-      'Calcolo ISEE: Ordinario, corrente, universitari',
-      'DSU (Dichiarazione Sostitutiva Unica)',
-      'Bonus Sociali: Energia, gas e acqua',
-      'Assegno Unico e Universale'
+      { id: 'isee_ordinario', name: 'Calcolo ISEE Ordinario', price: 0 },
+      { id: 'isee_universitario', name: 'ISEE Universitario', price: 15 },
+      { id: 'assegno_unico', name: 'Pratica Assegno Unico', price: 25 },
+      { id: 'bonus_bollette', name: 'Richiesta Bonus Sociali', price: 10 }
     ]
   },
   {
@@ -41,11 +45,9 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     iconName: 'Home',
     description: 'Gestione tributi locali, contratti e pratiche catastali.',
     items: [
-      'IMU/TASI: Calcolo e compilazione modelli F24',
-      'Visure Catastali: Consultazione ipocatastale',
-      'Volture: Pratiche di voltura catastale',
-      'Contratti di affitto: Registrazione, risoluzione e proroga',
-      'Cedolare secca: Opzione per tassazione agevolata'
+      { id: 'imu_tasi', name: 'Calcolo IMU/TASI', price: 20 },
+      { id: 'contratto_affitto', name: 'Registrazione Contratto', price: 60 },
+      { id: 'visura_catastale', name: 'Visura Catastale', price: 15 }
     ]
   },
   {
@@ -54,10 +56,9 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     iconName: 'Users',
     description: 'Assistenza completa per la gestione dei collaboratori domestici.',
     items: [
-      'Assunzioni: Definizione del contratto di lavoro',
-      'Buste paga: Elaborazione mensile dei cedolini',
-      'Contributi INPS: Generazione MAV per versamenti',
-      'Modello CU: Certificazione Unica per colf/badanti'
+      { id: 'assunzione_colf', name: 'Contratto Assunzione', price: 50 },
+      { id: 'busta_paga', name: 'Elaborazione Busta Paga', price: 15 },
+      { id: 'mav_inps', name: 'Generazione MAV INPS', price: 10 }
     ]
   },
   {
@@ -66,10 +67,9 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     iconName: 'PlusCircle',
     description: 'Successioni, identità digitale e pratiche varie.',
     items: [
-      'Firma Digitale Remota: Firma dal tuo smartphone',
-      'Successioni: Dichiarazione e pratiche collegate',
-      'Spid: Rilascio credenziali digitali',
-      'Invio telematico: Atti all\'Agenzia delle Entrate'
+      { id: 'spid_rilascio', name: 'Rilascio SPID Personale', price: 15 },
+      { id: 'firma_digitale', name: 'Firma Digitale Remota', price: 40 },
+      { id: 'successione_base', name: 'Consulenza Successione', price: 100 }
     ]
   },
   {
@@ -78,22 +78,20 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     iconName: 'Plane',
     description: 'Prenotazione biglietti aerei e assistenza viaggi.',
     items: [
-      'Biglietti Aerei: Prenotazione voli nazionali e internazionali',
-      'Check-in online e gestione prenotazioni',
-      'Assicurazioni viaggio',
-      'Consulenza per visti turistici'
+      { id: 'volo_prenotazione', name: 'Prenotazione Volo', price: 10 },
+      { id: 'visto_consulenza', name: 'Consulenza Visto', price: 30 },
+      { id: 'assicurazione_viaggio', name: 'Assicurazione Viaggio', price: 15 }
     ]
   },
   {
     id: 'stranieri-extra',
-    title: 'Servizi per Stranieri ed Espatriati',
+    title: 'Servizi per Stranieri',
     iconName: 'Globe',
-    description: 'Supporto dedicato per permessi, cittadinanza e fiscalità internazionale.',
+    description: 'Supporto per permessi e fiscalità internazionale.',
     items: [
-      'Bonus Impatriati: Agevolazioni per chi rientra',
-      'Permessi di Soggiorno: Rinnovo e aggiornamento',
-      'Cittadinanza: Assistenza domande',
-      'Consulenza AIRE e Redditi Esteri'
+      { id: 'rinnovo_permesso', name: 'Rinnovo Permesso', price: 40 },
+      { id: 'cittadinanza_assistenza', name: 'Domanda Cittadinanza', price: 150 },
+      { id: 'consulenza_aire', name: 'Consulenza AIRE', price: 50 }
     ]
   }
 ];

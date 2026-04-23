@@ -1,17 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageSquare, X, Send, Bot, User, Loader2 } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User, Loader2, Sparkles, ChevronRight } from 'lucide-react';
 import { getChatResponse } from '../services/geminiService';
 import { useTranslation } from 'react-i18next';
+import Markdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'model';
   content: string;
 }
 
+const QUICK_QUESTIONS = [
+  'Come faccio il 730?',
+  'Quali documenti servono per l\'ISEE?',
+  'Costo rinnovo permesso soggiorno',
+  'Prenota un biglietto aereo'
+];
+
 export const AIChatBot = () => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(true);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,9 +28,13 @@ export const AIChatBot = () => {
 
   useEffect(() => {
     setMessages([
-      { role: 'model', content: t('chat_greeting') }
+      { role: 'model', content: `Ciao! Sono **Nasr AI**, l'assistente virtuale d'élite di CAF Nasr. 🇮🇹\n\nPosso aiutarti con pratiche fiscali, ISEE, permessi di soggiorno e molto altro. Come posso esserti utile oggi?` }
     ]);
-  }, [t]);
+
+    // Hide tooltip after some time
+    const timer = setTimeout(() => setShowTooltip(false), 8000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -31,12 +44,12 @@ export const AIChatBot = () => {
     scrollToBottom();
   }, [messages, isLoading]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+  const handleSubmit = async (e?: React.FormEvent, directMessage?: string) => {
+    e?.preventDefault();
+    const userMessage = directMessage || input.trim();
+    if (!userMessage || isLoading) return;
 
-    const userMessage = input.trim();
-    setInput('');
+    if (!directMessage) setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
 
@@ -52,94 +65,163 @@ export const AIChatBot = () => {
 
   return (
     <>
-      {/* Toggle Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-24 right-6 z-50 w-14 h-14 bg-brand-blue text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all hover:bg-brand-blue-light"
-      >
-        {isOpen ? <X size={28} /> : <MessageSquare size={28} />}
-        {!isOpen && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-green opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-4 w-4 bg-brand-green"></span>
-          </span>
-        )}
-      </button>
+      {/* Toggle Button & Tooltip */}
+      <div className="fixed bottom-24 right-6 z-50 flex flex-col items-end gap-3">
+        <AnimatePresence>
+          {(showTooltip && !isOpen) && (
+            <motion.div
+              initial={{ opacity: 0, x: 20, scale: 0.8 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 20, scale: 0.8 }}
+              className="bg-brand-blue text-white px-4 py-2 rounded-2xl shadow-xl border border-white/20 text-sm font-bold flex items-center gap-2 mb-2 whitespace-nowrap"
+            >
+              <Sparkles size={16} className="text-yellow-400 animate-pulse" />
+              Hai una domanda? Chiedi a Nasr AI!
+              <div className="absolute -bottom-1 right-6 w-3 h-3 bg-brand-blue rotate-45 border-r border-b border-white/20"></div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        <button
+          onClick={() => { setIsOpen(!isOpen); setShowTooltip(false); }}
+          className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 ${
+            isOpen ? 'bg-white text-brand-blue border-2 border-brand-blue' : 'hero-gradient text-white ring-4 ring-white shadow-brand-blue/30'
+          }`}
+        >
+          {isOpen ? <X size={28} /> : (
+            <div className="relative">
+              <MessageSquare size={28} />
+              <motion.div 
+                animate={{ scale: [1, 1.2, 1] }} 
+                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute -top-1 -right-1 w-3 h-3 bg-brand-green rounded-full border-2 border-white" 
+              />
+            </div>
+          )}
+        </button>
+      </div>
 
       {/* Chat Window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 100, scale: 0.8 }}
+            initial={{ opacity: 0, y: 50, scale: 0.95, transformOrigin: 'bottom right' }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 100, scale: 0.8 }}
-            className="fixed bottom-32 right-6 z-50 w-[350px] sm:w-[400px] h-[500px] bg-white rounded-3xl shadow-2xl overflow-hidden border border-brand-border flex flex-col"
+            exit={{ opacity: 0, y: 50, scale: 0.95 }}
+            className="fixed bottom-32 right-6 z-50 w-[380px] sm:w-[420px] h-[600px] bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(30,58,138,0.3)] overflow-hidden border border-brand-border flex flex-col glass"
           >
             {/* Header */}
-            <div className="bg-brand-blue p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                  <Bot className="text-white" size={24} />
+            <div className="bg-brand-blue p-6 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg transform rotate-3">
+                    <Bot className="text-brand-blue" size={28} />
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-brand-green rounded-full border-4 border-brand-blue animate-pulse" />
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-sm">Assistente Nasr AI</h3>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 bg-brand-green rounded-full animate-pulse"></span>
-                    <span className="text-white/60 text-[10px] font-bold uppercase tracking-widest">Online</span>
+                  <h3 className="text-white font-black text-lg tracking-tight leading-none mb-1">Nasr AI</h3>
+                  <div className="flex items-center gap-1.5 overflow-hidden">
+                    <span className="text-white/60 text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap animate-marquee">
+                      Supporto Fiscale Intelligente • H24 •
+                    </span>
                   </div>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-white/60 hover:text-white">
-                <X size={20} />
+              <button 
+                onClick={() => setIsOpen(false)} 
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-all"
+              >
+                <X size={24} />
               </button>
             </div>
 
-            {/* Messages */}
-            <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-brand-bg/50">
+            {/* Messages Area */}
+            <div className="flex-grow overflow-y-auto p-6 space-y-6 bg-slate-50/50 custom-scrollbar">
               {messages.map((msg, index) => (
                 <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`flex gap-2 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${msg.role === 'user' ? 'bg-brand-blue text-white' : 'bg-white border border-brand-border text-brand-blue'}`}>
-                      {msg.role === 'user' ? <User size={16} /> : <Bot size={16} />}
+                  <div className={`flex gap-3 max-w-[90%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <div className={`w-9 h-9 rounded-xl flex-shrink-0 flex items-center justify-center shadow-sm ${msg.role === 'user' ? 'bg-brand-blue text-white' : 'bg-white border border-brand-border text-brand-blue'}`}>
+                      {msg.role === 'user' ? <User size={18} /> : <Bot size={18} />}
                     </div>
-                    <div className={`p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user' ? 'bg-brand-blue text-white rounded-tr-none' : 'bg-white border border-brand-border text-brand-text-main rounded-tl-none shadow-sm'}`}>
-                      {msg.content}
+                    <div className={`p-4 rounded-3xl text-sm leading-relaxed shadow-sm ${
+                      msg.role === 'user' 
+                        ? 'bg-brand-blue text-white rounded-tr-none' 
+                        : 'bg-white border border-brand-border text-brand-text-main rounded-tl-none markdown-body'
+                    }`}>
+                      {msg.role === 'model' ? (
+                        <Markdown>{msg.content}</Markdown>
+                      ) : (
+                        msg.content
+                      )}
                     </div>
                   </div>
                 </div>
               ))}
+              
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="flex gap-2 max-w-[85%] items-center">
-                    <div className="w-8 h-8 rounded-full bg-white border border-brand-border text-brand-blue flex items-center justify-center">
-                      <Bot size={16} />
+                  <div className="flex gap-3 max-w-[85%] items-center">
+                    <div className="w-9 h-9 rounded-xl bg-white border border-brand-border text-brand-blue flex items-center justify-center shadow-sm">
+                      <Bot size={18} />
                     </div>
-                    <div className="bg-white border border-brand-border p-3 rounded-2xl rounded-tl-none shadow-sm">
-                      <Loader2 size={16} className="animate-spin text-brand-blue" />
+                    <div className="bg-white border border-brand-border px-5 py-3 rounded-3xl rounded-tl-none shadow-sm flex items-center gap-1">
+                      <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, delay: 0 }} className="w-1.5 h-1.5 bg-brand-blue rounded-full" />
+                      <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 bg-brand-blue rounded-full" />
+                      <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 bg-brand-blue rounded-full" />
                     </div>
                   </div>
                 </div>
               )}
+
+              {/* Suggested Questions */}
+              {!isLoading && messages.length < 3 && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="pt-4 space-y-2"
+                >
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2 mb-2">Domande Frequenti</p>
+                  <div className="flex flex-wrap gap-2">
+                    {QUICK_QUESTIONS.map((q, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleSubmit(undefined, q)}
+                        className="bg-white border border-brand-border hover:border-brand-blue hover:text-brand-blue px-3 py-2 rounded-2xl text-[11px] font-bold transition-all shadow-sm flex items-center gap-1 group"
+                      >
+                        {q}
+                        <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -ml-2 group-hover:ml-0 transition-all text-brand-blue" />
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+              
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input */}
-            <form onSubmit={handleSubmit} className="p-4 bg-white border-t border-brand-border flex gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Chiedi qualcosa..."
-                className="flex-grow bg-brand-bg/50 border-2 border-transparent focus:border-brand-blue/30 outline-none rounded-xl px-4 py-2 text-sm transition-all"
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="w-10 h-10 bg-brand-blue text-white rounded-xl flex items-center justify-center disabled:opacity-50 hover:bg-brand-blue-light transition-all flex-shrink-0 shadow-lg"
-              >
-                <Send size={18} />
-              </button>
-            </form>
+            {/* Input Bar */}
+            <div className="p-6 bg-white border-t border-brand-border">
+              <form onSubmit={handleSubmit} className="relative">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Scrivi qui il tuo dubbio fiscale..."
+                  className="w-full bg-brand-bg/80 border-2 border-brand-border focus:border-brand-blue/50 focus:bg-white outline-none rounded-[2rem] pl-6 pr-14 py-4 text-sm font-medium transition-all shadow-inner"
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  className="absolute right-2 top-2 w-11 h-11 bg-brand-blue text-white rounded-full flex items-center justify-center disabled:opacity-30 hover:bg-brand-blue-light transition-all shadow-[0_4px_15px_rgba(30,58,138,0.3)] group"
+                >
+                  {isLoading ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />}
+                </button>
+              </form>
+              <p className="text-[10px] text-center text-gray-400 mt-4 font-medium italic">
+                Nasr AI può commettere errori. Verifica le informazioni importanti.
+              </p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
