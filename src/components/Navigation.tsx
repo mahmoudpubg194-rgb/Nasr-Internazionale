@@ -1,36 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Phone, Calendar, Globe, Languages, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { Menu, X, Phone, Calendar, Globe, Languages, User, LogOut, LayoutDashboard, FileText } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { auth } from '../lib/firebase';
-import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import { useAuth } from '../context/AuthContext';
 
 export const Navigation = ({ onOpenBooking }: { onOpenBooking: () => void }) => {
   const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [langSearch, setLangSearch] = useState('');
+  const { user, loginWithGoogle, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
-    return () => unsub();
-  }, []);
-
-  const handleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const handleLogout = async () => {
-    await signOut(auth);
+    await logout();
     navigate('/');
   };
 
@@ -73,7 +59,13 @@ export const Navigation = ({ onOpenBooking }: { onOpenBooking: () => void }) => 
     i18n.changeLanguage(code);
     setIsLangOpen(false);
     setIsOpen(false);
+    setLangSearch('');
   };
+
+  const filteredLanguages = languages.filter(lang => 
+    lang.name.toLowerCase().includes(langSearch.toLowerCase()) || 
+    lang.code.toLowerCase().includes(langSearch.toLowerCase())
+  );
 
   const currentLang = (i18n.language || 'it').split('-')[0];
 
@@ -86,6 +78,17 @@ export const Navigation = ({ onOpenBooking }: { onOpenBooking: () => void }) => 
     setIsOpen(!isOpen);
     if (isLangOpen) setIsLangOpen(false);
   };
+
+  useEffect(() => {
+    if (isOpen || isLangOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, isLangOpen]);
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-[60] h-[88px] flex items-center transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-md border-b border-brand-border shadow-md h-[72px]' : 'bg-transparent h-[88px]'}`}>
@@ -136,19 +139,41 @@ export const Navigation = ({ onOpenBooking }: { onOpenBooking: () => void }) => 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-brand-border py-2 overflow-hidden flex flex-col"
+                        className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-brand-border py-2 flex flex-col"
                       >
                         <div className="max-h-[60vh] overflow-y-auto py-1">
-                          {languages.map((lang) => (
-                            <button
-                              key={lang.code}
-                              onClick={() => changeLanguage(lang.code)}
-                              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold hover:bg-brand-bg transition-colors ${currentLang === lang.code ? 'text-brand-blue bg-brand-accent' : 'text-gray-600'}`}
-                            >
-                              <span className="text-xl">{lang.flag}</span>
-                              <span>{lang.name}</span>
-                            </button>
-                          ))}
+                          <div className="px-3 pb-2 pt-1">
+                            <div className="relative">
+                              <input 
+                                type="text" 
+                                placeholder={t('search_lang', 'Search language...')}
+                                value={langSearch}
+                                onChange={(e) => setLangSearch(e.target.value)}
+                                className="w-full pl-8 pr-3 py-2 bg-brand-bg border border-brand-border/30 rounded-xl text-xs font-bold focus:outline-none focus:border-brand-blue/50"
+                              />
+                              <X 
+                                size={14} 
+                                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" 
+                              />
+                            </div>
+                          </div>
+                          <div className="border-t border-brand-border/10 my-1" />
+                          {filteredLanguages.length > 0 ? (
+                            filteredLanguages.map((lang) => (
+                              <button
+                                key={lang.code}
+                                onClick={() => changeLanguage(lang.code)}
+                                className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold hover:bg-brand-bg transition-colors ${currentLang === lang.code ? 'text-brand-blue bg-brand-accent' : 'text-gray-600'}`}
+                              >
+                                <span className="text-xl">{lang.flag}</span>
+                                <span>{lang.name}</span>
+                              </button>
+                            ))
+                          ) : (
+                            <div className="px-4 py-3 text-xs font-bold text-gray-400 text-center">
+                              {t('no_results', 'No results')}
+                            </div>
+                          )}
                         </div>
                       </motion.div>
                     )}
@@ -174,13 +199,27 @@ export const Navigation = ({ onOpenBooking }: { onOpenBooking: () => void }) => 
                        <User size={20} className={!isLight ? 'text-brand-blue' : 'text-white'} />
                      )}
                    </Link>
-                   <div className="absolute -bottom-12 right-0 hidden group-hover:flex flex-col gap-1 w-40 bg-white shadow-2xl rounded-xl border border-gray-100 p-1 z-[100]">
+                    <div className="absolute top-full right-0 hidden group-hover:flex flex-col gap-1 w-52 bg-white shadow-2xl rounded-2xl border border-gray-100 p-1.5 z-[100] mt-2">
                      <Link 
                        to="/dashboard"
                        className="flex items-center gap-2 text-brand-blue p-2 rounded-lg text-xs font-bold hover:bg-blue-50 transition-colors"
                      >
                        <LayoutDashboard size={14} />
-                       Dashboard
+                       {t('nav_dashboard', 'Dashboard')}
+                     </Link>
+                     <Link 
+                       to="/dashboard"
+                       className="flex items-center gap-2 text-brand-blue p-2 rounded-lg text-xs font-bold hover:bg-blue-50 transition-colors"
+                     >
+                       <Calendar size={14} />
+                       {t('nav_my_bookings', 'I Miei Appuntamenti')}
+                     </Link>
+                     <Link 
+                       to="/dashboard"
+                       className="flex items-center gap-2 text-brand-blue p-2 rounded-lg text-xs font-bold hover:bg-blue-50 transition-colors"
+                     >
+                       <FileText size={14} />
+                       {t('nav_my_documents', 'I Miei Documenti')}
                      </Link>
                      <button 
                        onClick={handleLogout}
@@ -193,7 +232,7 @@ export const Navigation = ({ onOpenBooking }: { onOpenBooking: () => void }) => 
                  </div>
                ) : (
                  <button 
-                   onClick={handleLogin}
+                   onClick={loginWithGoogle}
                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm border-2 transition-all ${!isLight ? 'border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white' : 'border-white text-white hover:bg-white hover:text-brand-blue'}`}
                  >
                    <User size={18} />
@@ -219,7 +258,7 @@ export const Navigation = ({ onOpenBooking }: { onOpenBooking: () => void }) => 
             </button>
             <button
               onClick={toggleMenu}
-              className={`${!isLight ? 'text-brand-blue' : 'text-white'}`}
+              className={`${isOpen ? 'text-white' : (!isLight ? 'text-brand-blue' : 'text-white')}`}
             >
               {isOpen ? <X size={32} /> : <Menu size={32} />}
             </button>
@@ -234,26 +273,55 @@ export const Navigation = ({ onOpenBooking }: { onOpenBooking: () => void }) => 
              initial={{ opacity: 0 }}
              animate={{ opacity: 1 }}
              exit={{ opacity: 0 }}
-             className="fixed inset-0 z-[70] bg-white p-6 flex flex-col"
+             className="fixed inset-0 z-[70] bg-white p-6 flex flex-col overflow-y-auto"
           >
-             <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-black text-brand-blue uppercase tracking-widest">{t('select_language', 'Select Language')}</h3>
-                <button onClick={() => setIsLangOpen(false)} className="p-2 bg-brand-bg rounded-xl text-brand-blue">
-                   <X size={24} />
-                </button>
-             </div>
-             <div className="flex-grow overflow-y-auto">
+             <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                   <h3 className="text-xl font-black text-brand-blue uppercase tracking-widest">{t('select_language', 'Select Language')}</h3>
+                   <button onClick={() => {
+                      setIsLangOpen(false);
+                      setLangSearch('');
+                   }} className="p-2 bg-brand-bg rounded-xl text-brand-blue">
+                      <X size={24} />
+                   </button>
+                </div>
+                
+                <div className="relative mt-2">
+                   <input 
+                     type="text" 
+                     placeholder={t('search_lang', 'Search language...')}
+                     value={langSearch}
+                     onChange={(e) => setLangSearch(e.target.value)}
+                     className="w-full pl-10 pr-4 py-4 bg-brand-bg border-2 border-transparent focus:border-brand-blue/30 rounded-2xl text-sm font-bold focus:outline-none transition-all"
+                   />
+                   <Globe size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-blue/40" />
+                   {langSearch && (
+                     <button 
+                       onClick={() => setLangSearch('')}
+                       className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white rounded-full text-brand-blue shadow-sm"
+                     >
+                        <X size={16} />
+                     </button>
+                   )}
+                </div>
+
                 <div className="grid grid-cols-2 gap-3 pb-10">
-                   {languages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => changeLanguage(lang.code)}
-                        className={`flex flex-col items-center justify-center p-6 rounded-3xl border-2 transition-all ${currentLang === lang.code ? 'border-brand-blue bg-brand-accent text-brand-blue' : 'border-brand-bg bg-brand-bg text-gray-500'}`}
-                      >
-                         <span className="text-4xl mb-2">{lang.flag}</span>
-                         <span className="font-bold text-sm tracking-tight">{lang.name}</span>
-                      </button>
-                   ))}
+                   {filteredLanguages.length > 0 ? (
+                     filteredLanguages.map((lang) => (
+                       <button
+                         key={lang.code}
+                         onClick={() => changeLanguage(lang.code)}
+                         className={`flex flex-col items-center justify-center p-6 rounded-3xl border-2 transition-all ${currentLang === lang.code ? 'border-brand-blue bg-brand-accent text-brand-blue' : 'border-brand-bg bg-brand-bg text-gray-500'}`}
+                       >
+                          <span className="text-4xl mb-2">{lang.flag}</span>
+                          <span className="font-bold text-sm tracking-tight">{lang.name}</span>
+                       </button>
+                     ))
+                   ) : (
+                     <div className="col-span-2 py-10 text-center">
+                       <span className="text-gray-400 font-bold text-sm uppercase tracking-widest">{t('no_results', 'Nessuno risultato')}</span>
+                     </div>
+                   )}
                 </div>
              </div>
           </motion.div>
@@ -267,7 +335,7 @@ export const Navigation = ({ onOpenBooking }: { onOpenBooking: () => void }) => 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="md:hidden fixed inset-0 z-[55] bg-brand-blue text-white flex flex-col pt-32 pb-10 px-8"
+            className="lg:hidden fixed inset-0 z-[55] bg-brand-blue text-white flex flex-col pt-32 pb-10 px-8 overflow-y-auto"
           >
             <div className="flex flex-col space-y-8">
               {navLinks.map((link) => (
@@ -283,19 +351,40 @@ export const Navigation = ({ onOpenBooking }: { onOpenBooking: () => void }) => 
             
             <div className="mt-auto space-y-6 pt-12 border-t border-white/10">
                {user && (
-                 <Link 
-                   to="/dashboard"
-                   className="flex items-center gap-4 bg-white/10 p-4 rounded-2xl"
-                   onClick={() => setIsOpen(false)}
-                 >
-                   <div className="w-12 h-12 rounded-full overflow-hidden bg-white/20 flex items-center justify-center">
-                      {user.photoURL ? <img src={user.photoURL} alt="User" /> : <User size={24} />}
+                 <div className="flex flex-col gap-2">
+                   <Link 
+                     to="/dashboard"
+                     className="flex items-center gap-4 bg-white/10 p-4 rounded-2xl"
+                     onClick={() => setIsOpen(false)}
+                   >
+                     <div className="w-12 h-12 rounded-full overflow-hidden bg-white/20 flex items-center justify-center">
+                        {user.photoURL ? <img src={user.photoURL} alt="User" /> : <User size={24} />}
+                     </div>
+                     <div>
+                       <div className="font-bold">{user.displayName || 'Utente'}</div>
+                       <div className="text-xs opacity-50">Gestisci il tuo profilo</div>
+                     </div>
+                   </Link>
+                   
+                   <div className="grid grid-cols-2 gap-2">
+                     <Link 
+                       to="/dashboard"
+                       className="flex items-center gap-2 bg-white/5 p-3 rounded-xl text-sm font-bold border border-white/10"
+                       onClick={() => setIsOpen(false)}
+                     >
+                       <Calendar size={16} />
+                       {t('nav_my_bookings', 'I Miei Appuntamenti')}
+                     </Link>
+                     <Link 
+                       to="/dashboard"
+                       className="flex items-center gap-2 bg-white/5 p-3 rounded-xl text-sm font-bold border border-white/10"
+                       onClick={() => setIsOpen(false)}
+                     >
+                       <FileText size={16} />
+                       {t('nav_my_documents', 'Documenti')}
+                     </Link>
                    </div>
-                   <div>
-                     <div className="font-bold">{user.displayName || 'Utente'}</div>
-                     <div className="text-xs opacity-50">Vai alla Dashboard</div>
-                   </div>
-                 </Link>
+                 </div>
                )}
 
                <div className="flex flex-col gap-1">
@@ -305,7 +394,7 @@ export const Navigation = ({ onOpenBooking }: { onOpenBooking: () => void }) => 
                
                {!user ? (
                  <button 
-                   onClick={handleLogin}
+                   onClick={loginWithGoogle}
                    className="w-full bg-white text-brand-blue py-5 rounded-2xl font-black text-xl flex justify-center items-center shadow-2xl"
                  >
                    <User className="w-6 h-6 mr-3" />

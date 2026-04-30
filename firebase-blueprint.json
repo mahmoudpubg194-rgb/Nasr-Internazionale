@@ -63,19 +63,22 @@
       },
       "required": ["userId", "serviceId", "amount", "status"]
     },
-    "appointments": {
-      "title": "Appointments",
-      "description": "Calendar bookings for video consultations.",
+    "bookings": {
+      "title": "Bookings",
+      "description": "Service reservations and consultations.",
       "type": "object",
       "properties": {
         "userId": { "type": "string" },
+        "service": { "type": "string" },
         "date": { "type": "string" },
         "time": { "type": "string" },
-        "type": { "type": "string" },
-        "orderId": { "type": "string" },
-        "meetingLink": { "type": "string" }
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "status": { "type": "string", "enum": ["confirmed", "cancelled", "completed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["userId", "date", "time"]
+      "required": ["userId", "service", "date", "time", "name", "phone", "status"]
     }
   },
   "firestore": {
@@ -95,8 +98,8 @@
       "schema": "orders",
       "description": "Payment records"
     },
-    "appointments/{appointmentId}": {
-      "schema": "appointments",
+    "bookings/{bookingId}": {
+      "schema": "bookings",
       "description": "Scheduled consultations"
     }
   }

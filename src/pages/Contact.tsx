@@ -47,15 +47,21 @@ const Contact: React.FC = () => {
               <h3 className="text-2xl font-bold text-brand-text-main mb-8">{t('contact_info_title')}</h3>
               
               <div className="space-y-6 flex-grow">
-                <div className="flex items-start gap-6 p-6 bg-white rounded-2xl border border-brand-border shadow-sm group hover:border-brand-blue transition-all">
+                <a 
+                  href="https://maps.app.goo.gl/a5ghiW2TqZmk3HxX7" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-6 p-6 bg-white rounded-2xl border border-brand-border shadow-sm group hover:border-brand-blue hover:shadow-lg transition-all block"
+                >
                    <div className="w-12 h-12 bg-brand-bg rounded-xl flex items-center justify-center text-brand-blue flex-shrink-0 group-hover:scale-110 transition-transform">
                       <MapPin size={24} />
                    </div>
                    <div>
                       <div className="text-xs font-bold text-brand-text-muted uppercase tracking-widest mb-1">{t('contact_address_label')}</div>
-                      <div className="text-lg font-bold text-brand-text-main leading-tight">Via Ruggero Leoncavallo, 31, 20131 Milano (MI)</div>
+                      <div className="text-lg font-bold text-brand-text-main leading-tight underline decoration-brand-blue/30 group-hover:decoration-brand-blue">Via Ruggero Leoncavallo, 31, 20131 Milano (MI)</div>
+                      <div className="text-[10px] text-brand-blue font-black uppercase mt-2 group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">Apri in Maps <Send size={10} /></div>
                    </div>
-                </div>
+                </a>
 
                 <div className="flex items-start gap-6 p-6 bg-white rounded-2xl border border-brand-border shadow-sm group hover:border-brand-blue transition-all">
                    <div className="w-12 h-12 bg-brand-bg rounded-xl flex items-center justify-center text-brand-blue flex-shrink-0 group-hover:scale-110 transition-transform">
@@ -170,14 +176,25 @@ const Contact: React.FC = () => {
         </div>
 
         {/* Map Placeholder */}
-        <div className="rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white h-[500px] relative">
+        <div className="relative group rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white h-[500px]">
           <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2797.1033285705357!2d9.2217647!3d45.4878566!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4786c6ef49cd2959%3A0x6b45f1b1c6d1774e!2sVia%20Ruggero%20Leoncavallo%2C%2031%2C%2020131%20Milano%20MI!5e0!3m2!1sit!2sit!4v1713801234567!5m2!1sit!2sit" 
-            className="w-full h-full border-0 grayscale hover:grayscale-0 transition-all duration-700"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2797.1033285705357!2d9.2217647!3d45.4878566!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4786c6ef49cd2959%3A0x6b45f1b1c6d1774e!2sCAF%20Nasr%20Internazionale!5e0!3m2!1sit!2sit!4v1713801234567!5m2!1sit!2sit" 
+            className="w-full h-full border-0 grayscale group-hover:grayscale-0 transition-all duration-700"
             allowFullScreen={true} 
             loading="lazy" 
             referrerPolicy="no-referrer-when-downgrade"
           />
+          <div className="absolute top-6 left-6 z-10">
+            <a 
+              href="https://maps.app.goo.gl/a5ghiW2TqZmk3HxX7" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-white/90 backdrop-blur-md text-brand-blue px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl border border-white hover:bg-brand-blue hover:text-white transition-all flex items-center gap-2"
+            >
+              <MapPin size={16} />
+              Apri in Google Maps
+            </a>
+          </div>
         </div>
       </div>
     </div>

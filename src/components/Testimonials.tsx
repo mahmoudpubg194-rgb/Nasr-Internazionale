@@ -98,7 +98,7 @@ export const Testimonials = () => {
                       {TESTIMONIALS[currentIndex].name}
                     </h4>
                     <p className="text-sm font-bold text-brand-green uppercase tracking-widest">
-                      {t(`testimonials.role_${TESTIMONIALS[currentIndex].id === '1' ? 'privato' : TESTIMONIALS[currentIndex].id === '2' ? 'straniero' : TESTIMONIALS[currentIndex].id === '3' ? 'madre' : TESTIMONIALS[currentIndex].id === '4' ? 'imprenditore' : 'fedele'}`, (TESTIMONIALS[currentIndex] as any).role || 'Cliente')}
+                      {t(`testimonials.role_${TESTIMONIALS[currentIndex].id === '1' ? 'privato' : TESTIMONIALS[currentIndex].id === '2' ? 'straniero' : TESTIMONIALS[currentIndex].id === '3' ? 'madre' : TESTIMONIALS[currentIndex].id === '4' ? 'imprenditore' : 'fedele'}`, (TESTIMONIALS[currentIndex] as any).role || 'Cliente') as string}
                     </p>
                   </div>
                 </div>

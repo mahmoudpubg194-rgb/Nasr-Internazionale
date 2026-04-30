@@ -61,7 +61,14 @@ export const Footer = () => {
             <ul className="space-y-4 text-blue-100/70 text-sm">
               <li className="flex items-start">
                 <span className="font-bold text-white mr-2">{t('contact_address_label')}:</span>
-                Via Ruggero Leoncavallo, 31, Milano
+                <a 
+                  href="https://maps.app.goo.gl/a5ghiW2TqZmk3HxX7" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  Via Ruggero Leoncavallo, 31, Milano
+                </a>
               </li>
               <li className="flex items-start">
                 <span className="font-bold text-white mr-2">{t('contact_email_label')}:</span>

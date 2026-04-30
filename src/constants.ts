@@ -4,6 +4,8 @@ export interface ServiceItem {
   id: string;
   name: string;
   price: number;
+  availableFrom?: string; // Format: "MM-DD"
+  availableTo?: string;   // Format: "MM-DD"
 }
 
 export interface ServiceCategory {
@@ -21,10 +23,10 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     iconName: 'FileText',
     description: 'Assistenza completa per la tua situazione fiscale e dichiarativa.',
     items: [
-      { id: '730_base', name: 'Modello 730 Base', price: 30 },
-      { id: '730_completo', name: 'Modello 730 con Visto', price: 50 },
-      { id: 'unico_pf', name: 'Modello Redditi PF', price: 80 },
-      { id: 'red_inps', name: 'Modello RED Pensionati', price: 20 }
+      { id: '730_base', name: 'Modello 730 Base', price: 30, availableFrom: '04-01', availableTo: '09-30' },
+      { id: '730_completo', name: 'Modello 730 con Visto', price: 50, availableFrom: '04-01', availableTo: '09-30' },
+      { id: 'unico_pf', name: 'Modello Redditi PF', price: 80, availableFrom: '05-01', availableTo: '11-30' },
+      { id: 'red_inps', name: 'Modello RED Pensionati', price: 20, availableFrom: '06-01', availableTo: '02-28' }
     ]
   },
   {

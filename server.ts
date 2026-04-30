@@ -70,6 +70,27 @@ async function startServer() {
     }
   });
 
+  // API Route for Cancelling Booking
+  app.post('/api/booking/cancel', async (req, res) => {
+    const { bookingId, name, service, date, time } = req.body;
+
+    console.log('--- ANNULLAMENTO PRENOTAZIONE ---');
+    console.log('ID Prenotazione:', bookingId);
+    console.log('Cliente:', name);
+    console.log('Servizio:', service);
+    console.log('---------------------------------');
+
+    try {
+      // Simulate email notification for cancellation
+      console.log(`Simulazione invio email di annullamento a nasrmustafa213@gmail.com completata per il servizio ${service}.`);
+      
+      res.json({ success: true, message: 'Prenotazione annullata con successo' });
+    } catch (error) {
+      console.error('Errore annullamento:', error);
+      res.status(500).json({ success: false, message: 'Errore durante l\'annullamento' });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

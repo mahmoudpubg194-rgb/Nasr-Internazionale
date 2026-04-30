@@ -43,8 +43,36 @@ const Home: React.FC<HomeProps> = ({ onOpenBooking }) => {
               Siamo qui per aiutarti.
            </p>
            <button onClick={onOpenBooking} className="bg-brand-blue text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-brand-blue-light transition-all shadow-xl">
-              Prenota Ora (Gratis)
+              Richiedi Consulenza Gratuita
            </button>
+        </div>
+      </section>
+
+      <section className="py-20 bg-brand-bg">
+        <div className="container mx-auto px-4 md:px-12">
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-2xl md:text-3xl font-black text-brand-text-main mb-12 text-center uppercase tracking-tight">Domande Frequenti (FAQ)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-brand-border/50">
+                <h4 className="font-bold text-brand-blue mb-3">Chi può usufruire dei servizi del CAF?</h4>
+                <p className="text-sm text-brand-text-muted leading-relaxed">
+                  Tutti i cittadini, residenti e stranieri, che necessitano di assistenza fiscale, previdenziale o burocratica per gestire le proprie pratiche.
+                </p>
+              </div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-brand-border/50">
+                <h4 className="font-bold text-brand-blue mb-3">Come posso prenotare un appuntamento?</h4>
+                <p className="text-sm text-brand-text-muted leading-relaxed">
+                  Puoi prenotare direttamente online cliccando sul tasto "Richiedi Consulenza" o chiamandoci telefonicamente durante l'orario di apertura.
+                </p>
+              </div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-brand-border/50">
+                <h4 className="font-bold text-brand-blue mb-3">Quali documenti servono per il 730?</h4>
+                <p className="text-sm text-brand-text-muted leading-relaxed">
+                  Solitamente la Certificazione Unica (CU), scontrini fiscali per spese mediche, interessi passivi mutuo e giustificativi di oneri detraibili.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </main>

@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { 
   LayoutDashboard, FileText, CheckCircle, Clock, TrendingUp, ShieldCheck, 
-  Download, PenTool, Upload, CreditCard, Calendar, UserCheck, AlertTriangle
+  Download, PenTool, Upload, CreditCard, Calendar, UserCheck, AlertTriangle,
+  XCircle, Trash2
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { collection, query, where, onSnapshot, addDoc, serverTimestamp, updateDoc, doc, getDocFromServer } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 
 const COLORS = ['#1e3a8a', '#3b82f6', '#93c5fd', '#bfdbfe'];
@@ -17,7 +18,9 @@ const Dashboard = () => {
   const { user, loginWithGoogle } = useAuth();
   const [ practices, setPractices ] = useState<any[]>([]);
   const [ documents, setDocuments ] = useState<any[]>([]);
+  const [ bookings, setBookings ] = useState<any[]>([]);
   const [ uploadLoading, setUploadLoading ] = useState(false);
+  const [ processingBookingId, setProcessingBookingId ] = useState<string | null>(null);
   const [ connectionError, setConnectionError ] = useState<string | null>(null);
 
   useEffect(() => {
@@ -46,7 +49,7 @@ const Dashboard = () => {
           setPractices(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
         },
         (error) => {
-          console.error("Practices listener error:", error);
+          handleFirestoreError(error, OperationType.GET, 'practices');
         }
       );
 
@@ -57,13 +60,40 @@ const Dashboard = () => {
           setDocuments(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
         },
         (error) => {
-          console.error("Documents listener error:", error);
+          handleFirestoreError(error, OperationType.GET, 'documents');
+        }
+      );
+
+      // Listen to bookings
+      const qBookings = query(collection(db, 'bookings'), where('userId', '==', user.uid));
+      const unsubBookings = onSnapshot(qBookings, 
+        (snapshot) => {
+          const sorted = snapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .sort((a: any, b: any) => {
+              const dateTimeA = new Date(`${a.date}T${a.time || '00:00'}`).getTime();
+              const dateTimeB = new Date(`${b.date}T${b.time || '00:00'}`).getTime();
+              
+              if (dateTimeB !== dateTimeA) {
+                return dateTimeB - dateTimeA;
+              }
+              
+              // Fallback to createdAt if dates are identical
+              const createdA = a.createdAt?.seconds || 0;
+              const createdB = b.createdAt?.seconds || 0;
+              return createdB - createdA;
+            });
+          setBookings(sorted);
+        },
+        (error) => {
+          handleFirestoreError(error, OperationType.GET, 'bookings');
         }
       );
 
       return () => {
         unsubPractices();
         unsubDocs();
+        unsubBookings();
       };
     }
   }, [user]);
@@ -73,15 +103,51 @@ const Dashboard = () => {
     setUploadLoading(true);
     // Simulation: In a real app we'd use Firebase Storage
     setTimeout(async () => {
-      await addDoc(collection(db, 'documents'), {
-        userId: user.uid,
-        name: e.target.files![0].name,
-        url: '#',
-        isSigned: false,
-        createdAt: serverTimestamp()
-      });
-      setUploadLoading(false);
+      try {
+        await addDoc(collection(db, 'documents'), {
+          userId: user.uid,
+          name: e.target.files![0].name,
+          url: '#',
+          isSigned: false,
+          createdAt: serverTimestamp()
+        });
+      } catch (error) {
+        handleFirestoreError(error, OperationType.CREATE, 'documents');
+      } finally {
+        setUploadLoading(false);
+      }
     }, 1500);
+  };
+
+  const handleCancelBooking = async (booking: any) => {
+    if (!confirm("Sei sicuro di voler annullare questo appuntamento?")) return;
+    
+    setProcessingBookingId(booking.id);
+    try {
+      // 1. Update Firestore
+      const bookingRef = doc(db, 'bookings', booking.id);
+      await updateDoc(bookingRef, {
+        status: 'cancelled'
+      });
+
+      // 2. Notify Backend (Simulation for cancellation email)
+      await fetch('/api/booking/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bookingId: booking.id,
+          name: booking.name,
+          service: booking.service,
+          date: booking.date,
+          time: booking.time
+        })
+      });
+
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, `bookings/${booking.id}`);
+    } finally {
+      setProcessingBookingId(null);
+    }
   };
 
   const taxData = [
@@ -147,7 +213,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between mb-8 cursor-help hover:opacity-80 transition-opacity">
               <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-brand-blue" />
-                Le tue Pratiche (Amazon Style)
+                Le tue Pratiche
               </h2>
               <span className="text-xs font-bold text-brand-blue bg-blue-50 px-2 py-1 rounded-md">Real-Time</span>
             </div>
@@ -201,6 +267,66 @@ const Dashboard = () => {
                   </div>
                 ))
               )}
+            </div>
+
+            {/* Appointments Section */}
+            <div className="mt-16 pt-12 border-t border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900 mb-8 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-brand-blue" />
+                I tuoi Appuntamenti
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {bookings.length === 0 ? (
+                  <div className="col-span-full py-12 text-center bg-brand-bg/50 rounded-3xl border-2 border-dashed border-gray-200">
+                    <p className="text-gray-400 font-bold">Nessun appuntamento prenotato.</p>
+                  </div>
+                ) : (
+                  bookings.map((booking) => (
+                    <div key={booking.id} className={`bg-white border-2 rounded-3xl p-6 transition-all group ${booking.status === 'cancelled' ? 'opacity-60 grayscale border-gray-100' : 'hover:border-brand-blue/30 border-gray-100'}`}>
+                      <div className="flex justify-between items-start mb-4">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
+                          booking.status === 'cancelled' ? 'bg-gray-100 text-gray-400' : 'bg-blue-50 text-brand-blue group-hover:bg-brand-blue group-hover:text-white'
+                        }`}>
+                          {booking.status === 'cancelled' ? <XCircle size={24} /> : <Clock size={24} />}
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
+                            booking.status === 'confirmed' ? 'bg-green-100 text-green-600' : 
+                            booking.status === 'cancelled' ? 'bg-red-100 text-red-600' : 
+                            'bg-gray-100 text-gray-500'
+                          }`}>
+                            {booking.status === 'confirmed' ? 'Confermato' : booking.status === 'cancelled' ? 'Annullato' : booking.status}
+                          </span>
+                          {booking.status === 'confirmed' && (
+                            <button
+                              disabled={processingBookingId === booking.id}
+                              onClick={() => handleCancelBooking(booking)}
+                              className="text-[10px] font-black text-red-500 hover:text-red-700 uppercase tracking-widest flex items-center gap-1 transition-colors"
+                            >
+                              {processingBookingId === booking.id ? (
+                                <div className="w-3 h-3 border border-red-500 border-t-transparent rounded-full animate-spin" />
+                              ) : <Trash2 size={10} />}
+                              Annulla
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <h3 className={`font-black text-lg mb-1 ${booking.status === 'cancelled' ? 'text-gray-500' : 'text-brand-blue'}`}>{booking.service}</h3>
+                      <div className="flex items-center gap-4 text-sm text-gray-500 font-bold">
+                        <span className="flex items-center gap-1">
+                          <Calendar size={14} />
+                          {booking.date}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock size={14} />
+                          {booking.time}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </section>
 
